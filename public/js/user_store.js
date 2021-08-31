@@ -7,7 +7,7 @@ APP.USER.STORE = {}
    *
    * @returns {*|{type}|nothing}
    */
-  var loadUserData = async function () {
+  var loadUserData = () => {
     return getUserData().then(function (data) {
       APP.USER.STORE = data
       $(document).trigger('userDataLoaded', data)
