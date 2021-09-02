@@ -1,5 +1,6 @@
 import {render, screen, waitFor} from '@testing-library/react'
 import React from 'react'
+import ReactDOM from 'react-dom'
 import ProjectContainer from './ProjectContainer'
 import Immutable from 'immutable'
 import {rest} from 'msw'
