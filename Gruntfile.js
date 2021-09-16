@@ -106,7 +106,6 @@ module.exports = function (grunt) {
           basePath + 'login.js',
           basePath + 'cat_source/es6/components/projects/Dashboard.js',
           basePath + 'outsource.js',
-          basePath + 'cat_source/es6/ajax_utils/outsourceAjax.js',
         ],
         dest: buildPath + 'manage.js',
       },
@@ -161,7 +160,6 @@ module.exports = function (grunt) {
           basePath + 'login.js',
           basePath + 'analyze.js',
           basePath + 'outsource.js',
-          basePath + 'cat_source/es6/ajax_utils/outsourceAjax.js',
         ],
         dest: buildPath + 'analyze-build.js',
       },
@@ -186,7 +184,6 @@ module.exports = function (grunt) {
           basePath + 'new-project.js',
           // The main application script
           basePath + 'tm.js',
-          basePath + 'cat_source/es6/ajax_utils/outsourceAjax.js',
         ],
         dest: buildPath + 'upload.js',
       },
