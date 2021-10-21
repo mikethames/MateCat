@@ -643,7 +643,6 @@ LXQ.init = function () {
           })
         }
       })
-      debugger
       if (!isSource) {
         // let warningData = LXQ.lexiqaData.lexiqaWarnings[sid]
         const {suggestions, start, end} = range
