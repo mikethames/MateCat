@@ -82,12 +82,14 @@ class GlossaryWorker extends AbstractWorker {
 
         //prepare the error report
         $set_code = [];
-        //delete all id from the keys
-        foreach ( $id_matches as $id_match ) {
-            $config[ 'id_user' ] = $keys_hashes;
-            $config[ 'id' ]      = $id_match;
-            $TMS_RESULT          = $_TMS->delete( $config );
-            $set_code[]          = $TMS_RESULT;
+
+        //delete id from the keys
+        if($id_matches !== null){
+            $config[ 'id_user' ]  = $keys_hashes;
+            $config[ 'id_match' ] = $id_matches;
+
+            $TMS_RESULT           = $_TMS->delete( $config );
+            $set_code[]           = $TMS_RESULT;
         }
 
         $set_successful = true;
@@ -138,6 +140,7 @@ class GlossaryWorker extends AbstractWorker {
         //get TM keys with read grants
         $tm_keys = TmKeyManagement_TmKeyManagement::getJobTmKeys( $tm_keys, 'r', 'glos', $user->uid, $userRole );
 
+        unset( $config[ 'id_user' ] );
         if ( count( $tm_keys ) ) {
             $config[ 'id_user' ] = [];
             foreach ( $tm_keys as $tm_key ) {
@@ -381,6 +384,8 @@ class GlossaryWorker extends AbstractWorker {
         //get TM keys with read grants
         $tm_keys = TmKeyManagement_TmKeyManagement::getJobTmKeys( $tm_keys, 'w', 'glos', $user->uid, $userRole );
 
+        $config['id_match'] = $payload['id_segment'];
+
         $config[ 'segment' ]     = htmlspecialchars( $config[ 'segment' ], ENT_XML1 | ENT_QUOTES, 'UTF-8', false ); //no XML sanitization is needed because those requests are plain text from UI
         $config[ 'translation' ] = htmlspecialchars( $config[ 'translation' ], ENT_XML1 | ENT_QUOTES, 'UTF-8', false ); //no XML sanitization is needed because those requests are plain text from UI
 
@@ -400,6 +405,7 @@ class GlossaryWorker extends AbstractWorker {
             /**
              * @var $tm_key TmKeyManagement_TmKeyStruct
              */
+
             foreach ( $tm_keys as $tm_key ) {
                 $config[ 'id_user' ] = $tm_key->key;
                 $TMS_RESULT          = $_TMS->updateGlossary( $config );

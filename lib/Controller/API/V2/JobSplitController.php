@@ -9,7 +9,9 @@
 namespace API\V2;
 
 use API\V2\Exceptions\NotFoundException;
+use API\V2\Exceptions\UnprocessableException;
 use API\V2\Validators\ProjectPasswordValidator;
+use Exception;
 use Jobs_JobStruct;
 use ProjectManager;
 use Projects_ProjectStruct;
@@ -41,17 +43,37 @@ class JobSplitController extends KleinController {
         $this->appendValidator( $projectValidator );
     }
 
+    /**
+     * @throws UnprocessableException
+     */
     public function check() {
-        $pStruct = $this->getSplitData();
-        $this->response->json( [ 'data' => $pStruct[ 'split_result' ] ] );
+        try {
+            $pStruct = $this->getSplitData();
+            $this->response->json( [ 'data' => $pStruct[ 'split_result' ] ] );
+        } catch ( Exception $e ) {
+            throw new UnprocessableException( $e->getMessage(), $e->getCode(), $e );
+        }
     }
 
+    /**
+     * @throws UnprocessableException
+     * @throws Exception
+     */
     public function apply() {
-        $pStruct = $this->getSplitData();
+
+        try {
+            $pStruct = $this->getSplitData();
+        } catch ( Exception $e ) {
+            throw new UnprocessableException( $e->getMessage(), $e->getCode(), $e );
+        }
+
         $this->pManager->applySplit( $pStruct );
         $this->response->json( [ 'data' => $pStruct[ 'split_result' ] ] );
     }
 
+    /**
+     * @throws Exception
+     */
     private function getSplitData() {
         $this->pManager = new ProjectManager();
         $this->pManager->setProjectAndReLoadFeatures( $this->project_struct );

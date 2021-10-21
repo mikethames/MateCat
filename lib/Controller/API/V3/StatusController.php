@@ -81,12 +81,39 @@ class StatusController extends KleinController {
      */
     public function index() {
 
+        $noJobsFoundErrorMsg = 'The project doesn\'t have any jobs.';
+
         // params
         $id_project = $this->request->param( 'id_project' );
         $password   = $this->request->param( 'password' );
 
         // fetch data
         $this->fetchData( $id_project, $password );
+
+        // return 404 if there are no chunks
+        // (or they were deleted)
+        $chunksCount = 0;
+
+        if(!empty($this->chunks)){
+            foreach ($this->chunks as $chunk){
+                if($chunk->status_owner !== Constants_JobStatus::STATUS_DELETED){
+                    $chunksCount++;
+                }
+            }
+        }
+
+        if($chunksCount === 0 ){
+            $this->response->status()->setCode( 404 );
+            $this->response->json( [
+                'errors' => [
+                    [
+                            'code' => 0,
+                            'message' => $noJobsFoundErrorMsg
+                    ]
+                ]
+            ] );
+            exit();
+        }
 
         // build project metadata
         try {
@@ -106,19 +133,6 @@ class StatusController extends KleinController {
             }
         }
 
-        // return 404 if there are no chunks
-        // (or they were deleted)
-        if(empty($metadata->chunks)){
-            $this->response->status()->setCode( 404 );
-            $this->response->json( [
-                'errors' => [
-                    'code' => 0,
-                    'message' => 'No project found.'
-                ]
-            ] );
-            exit();
-        }
-
         $this->response->json( $metadata );
     }
 
@@ -131,14 +145,16 @@ class StatusController extends KleinController {
      */
     private function fetchData( $id_project, $password ) {
 
+        $ttl  = 60 * 5;
+
         // get project and resultSet
-        if ( null === $this->project = Projects_ProjectDao::findByIdAndPassword( $id_project, $password, 60 * 5 ) ) {
+        if ( null === $this->project = Projects_ProjectDao::findByIdAndPassword( $id_project, $password, $ttl ) ) {
             throw new NotFoundException( 'Project not found.' );
         }
 
-        $this->chunks = $this->project->getChunks( 60 * 5 );
+        $this->chunks = $this->project->getChunks( $ttl );
 
-        $this->projectResultSet = AnalysisDao::getProjectStatsVolumeAnalysis( $id_project );
+        $this->projectResultSet = AnalysisDao::getProjectStatsVolumeAnalysis( $id_project, $ttl );
 
         try {
             $amqHandler         = new AMQHandler();
@@ -172,8 +188,8 @@ class StatusController extends KleinController {
      */
     private function getProjectEngines() {
         return [
-                'id_tms_engine' => (int)$this->chunks[ 0 ]->id_tms,
-                'id_mt_engine'  => (int)$this->chunks[ 0 ]->id_mt_engine,
+            'id_tms_engine' => (int)$this->chunks[ 0 ]->id_tms,
+            'id_mt_engine'  => (int)$this->chunks[ 0 ]->id_mt_engine,
         ];
     }
 
@@ -226,7 +242,15 @@ class StatusController extends KleinController {
         $_total_wc_tm_analysis            = 0;
         $_total_wc_standard_analysis      = 0;
 
-        //VERY Expensive cycle ± 0.7 s for 27650 segments ( 150k words )
+        //
+        // *****************************************
+        // NOTE 2021-10-07
+        // *****************************************
+        //
+        // IMPROVEMENT: $this->projectResultSet is now cached
+        //
+        // VERY Expensive cycle ± 0.7 s for 27650 segments ( 150k words )
+        //
         foreach ( $this->projectResultSet as $segInfo ) {
 
             // $this->projectResultSet unique key with jid and password (needed for splitted jobs)
