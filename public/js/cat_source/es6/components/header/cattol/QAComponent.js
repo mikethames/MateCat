@@ -15,6 +15,7 @@ class QAComponent extends React.Component {
       labels: {
         TAG: 'Tag',
         TAGS: 'Tag',
+        SIZE: 'Characters limit',
         lexiqa: 'Lexiqa',
         GLOSSARY: 'Glossary',
         MISMATCH: 'T. Conflicts',
