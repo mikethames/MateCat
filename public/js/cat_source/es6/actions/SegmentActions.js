@@ -1045,7 +1045,7 @@ const SegmentActions = {
   },
   checkUnchangebleSegments: function (response, status) {
     if (response.unchangeble_segments.length > 0) {
-      if (config.isReview === 'APPROVED') {
+      if (!config.isReview) {
         this.showTranslateAllModalWarnirng()
       } else {
         this.showApproveAllModalWarnirng()
