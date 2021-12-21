@@ -29,7 +29,6 @@ import OfflineUtils from './utils/offlineUtils'
 import Shortcuts from './utils/shortcuts'
 import SegmentUtils from './utils/segmentUtils'
 import SegmentFooterTabMatches from './components/segments/SegmentFooterTabMatches'
-import {pluginOptions as lexiqaTooltipWarningPluginOptions} from './api/lexiqaTooltipwarnings'
 
 window.MC = {}
 
@@ -46,7 +45,6 @@ window.SegmentStore = SegmentStore
 window.Header = Header
 window.JobMetadata = JobMetadata
 
-window.ModalWindow = ModalWindow
 window.ConfirmMessageModal = ConfirmMessageModal
 window.JobMetadataModal = JobMetadataModal
 
@@ -70,4 +68,6 @@ window.SegmentUtils = SegmentUtils
 
 window.SegmentFooterTabMatches = SegmentFooterTabMatches
 
-window.lexiqaTooltipWarningPluginOptions = lexiqaTooltipWarningPluginOptions
+document.addEventListener('DOMContentLoaded', function (event) {
+  window.ModalWindow = ModalWindow
+})
