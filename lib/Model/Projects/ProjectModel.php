@@ -6,8 +6,10 @@ use API\V2\Exceptions\AuthorizationError;
 use Constants_Teams;
 use Exceptions\ValidationError;
 use Features\QaCheckBlacklist\BlacklistFromZip;
+use Features\QaCheckBlacklist\Utils\BlacklistUtils;
 use Projects_ProjectDao;
 use Projects_ProjectStruct;
+use RedisHandler;
 use Teams\MembershipDao;
 use Teams\MembershipStruct;
 use Teams\TeamDao;
@@ -42,19 +44,31 @@ class ProjectModel {
         $this->project_struct = $project;
     }
 
-    public function getBlacklist() {
-        //TODO This class  is a MODEL acting directly on the database records/tables applying some kind of logics. It must not operate on Files!!!
-        // TODO: replace with check of file exitence, don't read whole file. 
-        return BlacklistFromZip::getContent( $this->project_struct->getFirstOriginalZipPath() );
+    /**
+     * @return bool
+     * @throws \Exception
+     */
+    public function hasBlacklist() {
+
+        $blacklistUtils = new BlacklistUtils( ( new RedisHandler() )->getConnection() );
+
+        foreach ($this->project_struct->getJobs() as $job){
+            $blacklist = $blacklistUtils->getAbstractBlacklist($job);
+
+            if($blacklist->getContent()){
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
      * Caches the information of blacklist file presence to project metadata.
+     * @throws \Exception
      */
     public function saveBlacklistPresence() {
-        $blacklist = $this->getBlacklist();
-
-        if ( $blacklist ) {
+        if ( $this->hasBlacklist() ) {
             $this->project_struct->setMetadata( 'has_blacklist', '1' );
         }
     }
