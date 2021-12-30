@@ -1,7 +1,7 @@
 import React from 'react'
 import Immutable from 'immutable'
-import Cookies from 'js-cookie'
 import _ from 'lodash'
+import Cookies from 'js-cookie'
 
 import OutsourceInfo from './OutsourceInfo'
 import GMTSelect from './GMTSelect'

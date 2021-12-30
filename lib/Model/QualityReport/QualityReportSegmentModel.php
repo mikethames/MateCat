@@ -94,6 +94,10 @@ class QualityReportSegmentModel {
      * @throws \Exception
      */
     protected function _commonSegmentAssignments( QualityReport_QualityReportSegmentStruct $seg, MateCatFilter $Filter, $isForUI = false ) {
+
+        // original Filter instance containing the correct DataRefMap
+        $originalFilterInstance = clone $Filter;
+
         $seg->warnings            = $seg->getLocalWarning();
         $seg->pee                 = $seg->getPEE();
         $seg->ice_modified        = $seg->isICEModified();
@@ -101,9 +105,9 @@ class QualityReportSegmentModel {
         $seg->parsed_time_to_edit = CatUtils::parse_time_to_edit( $seg->time_to_edit );
 
         if($isForUI){
-            $seg->segment             = $Filter->fromLayer0ToLayer2( $seg->segment );
-            $seg->translation         = $Filter->fromLayer0ToLayer2( $seg->translation );
-            $seg->suggestion          = $Filter->fromLayer0ToLayer2( $seg->suggestion );
+            $seg->segment             = $originalFilterInstance->fromLayer0ToLayer2( $seg->segment );
+            $seg->translation         = $originalFilterInstance->fromLayer0ToLayer2( $seg->translation );
+            $seg->suggestion          = $originalFilterInstance->fromLayer0ToLayer2( $seg->suggestion );
         }
     }
 

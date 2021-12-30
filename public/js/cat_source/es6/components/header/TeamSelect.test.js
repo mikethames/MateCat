@@ -31,6 +31,7 @@ require('../../components')
 require('../../../../common')
 require('../../../../login')
 require('../../../../user_store')
+
 const fakeTeamsData = {
   threeTeams: {
     data: JSON.parse(

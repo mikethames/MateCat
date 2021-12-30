@@ -13,7 +13,6 @@ import {createTeam} from '../api/createTeam'
 import {addUserTeam} from '../api/addUserTeam'
 import {removeTeamUser} from '../api/removeTeamUser'
 import {updateTeamName} from '../api/updateTeamName'
-
 let ManageActions = {
   /********* Projects *********/
 

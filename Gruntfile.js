@@ -180,8 +180,8 @@ module.exports = function (grunt) {
           basePath + 'login.js',
           basePath + 'gdrive.upload.js',
           basePath + 'gdrive.picker.js',
-          basePath + 'upload.js',
           basePath + 'new-project.js',
+          // The main application script
           basePath + 'tm.js',
         ],
         dest: buildPath + 'upload.js',
@@ -201,7 +201,6 @@ module.exports = function (grunt) {
           basePath + 'common.js',
           basePath + 'user_store.js',
           basePath + 'login.js',
-          basePath + 'upload.js',
         ],
         dest: buildPath + 'xliffToTarget.js',
       },

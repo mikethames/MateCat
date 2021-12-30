@@ -1,6 +1,6 @@
 import React from 'react'
-import Cookies from 'js-cookie'
 import _ from 'lodash'
+import Cookies from 'js-cookie'
 
 import SegmentFooterMultiMatches from './SegmentFooterMultiMatches'
 import SegmentConstants from '../../constants/SegmentConstants'

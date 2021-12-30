@@ -7,6 +7,14 @@ import {lexiqaIgnoreError} from '../api/lexiqaIgnoreError'
 import SegmentStore from '../stores/SegmentStore'
 import {lexiqaTooltipwarnings} from '../api/lexiqaTooltipwarnings'
 
+const styleGuideManager = (() => {
+  let map = {}
+  function getMessage(id) {
+    return this.map[id].msg ?? ''
+  }
+  return {map, getMessage}
+})()
+
 const LXQ = {
   enabled: function () {
     return !!config.lxq_enabled
@@ -92,7 +100,6 @@ const LXQ = {
       function (err, result) {
         if (!err) {
           var noVisibleErrorsFound = false
-
           if (result.hasOwnProperty('qaData') && result.qaData.length > 0) {
             //highlight the segments
             // source_val = $( ".source", segment ).html();
@@ -163,7 +170,13 @@ const LXQ = {
             LXQ.lxqRemoveSegmentFromWarningList(id_segment)
           }
         } //there was no error
-        else {
+        // style guides
+        if (result.styleGuideMessages) {
+          const messages = result.styleGuideMessages.map((style) =>
+            styleGuideManager.getMessage(style),
+          )
+          SegmentActions.addLexiqaStyleGuideMessages(id_segment, messages)
+        } else {
           if (callback != null) callback()
         } //error in doQA
       }, //end lexiqaAuthenticator callback
@@ -629,6 +642,18 @@ LXQ.init = function () {
           })
         }
       })
+      if (!isSource) {
+        // let warningData = LXQ.lexiqaData.lexiqaWarnings[sid]
+        const {suggestions, start, end} = range
+        $.each(suggestions, function (i, suggest) {
+          messages.push({
+            msg: suggest,
+            start: start,
+            end: end,
+            type: 'suggestion',
+          })
+        })
+      }
       return messages
     }
 
@@ -770,6 +795,10 @@ LXQ.init = function () {
         modulesNoHighlight = Object.entries(data)
           .filter(([key]) => key[key.length - 1] === 'g')
           .map(([key]) => key)
+
+        styleGuideManager.map = {
+          ...(data?.styleGuideMessages ?? {}),
+        }
       })
     }
     // Interfaces

@@ -104,20 +104,21 @@ class Engines_MMT extends Engines_AbstractEngine {
     protected function fallback( $_config ){
 
         /**
-         * Create a record of type GoogleTranslate
+         * Create a record of type GoogleTranslateV3
          */
-        $newEngineStruct = EnginesModel_GoogleTranslateStruct::getStruct();
+        $newEngineStruct = EnginesModel_GoogleTranslateV3Struct::getStruct();
 
         $newEngineStruct->name                                = "Generic";
         $newEngineStruct->uid                                 = 0;
         $newEngineStruct->type                                = Constants_Engines::MT;
-        $newEngineStruct->extra_parameters[ 'client_secret' ] = $_config[ 'secret_key' ];
+        $newEngineStruct->extra_parameters[ 'credentials' ]   = $_config[ 'credentials' ];
+        $newEngineStruct->extra_parameters[ 'project_id' ]    = $_config[ 'project_id' ];
         $newEngineStruct->others                              = [];
 
         $gtEngine = Engine::createTempInstance( $newEngineStruct );
 
         /**
-         * @var $gtEngine Engines_GoogleTranslate
+         * @var $gtEngine Engines_GoogleTranslateV3
          */
         return $gtEngine->get( $_config );
 
