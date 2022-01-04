@@ -1,11 +1,11 @@
 <?php
 
-
-
 namespace Features\QaCheckBlacklist\Worker ;
 
 use Features\QaCheckBlacklist;
-use Features\QaCheckBlacklist\BlacklistFromZip;
+use Features\QaCheckBlacklist\AbstractBlacklist;
+use Features\QaCheckBlacklist\Utils\BlacklistUtils;
+use RedisHandler;
 use TaskRunner\Commons\AbstractElement;
 use TaskRunner\Commons\AbstractWorker;
 use TaskRunner\Commons\QueueElement;
@@ -54,9 +54,7 @@ class BlacklistWorker extends AbstractWorker {
             return ;
         }
 
-        $job = \Jobs_JobDao::getById( $params['id_job'] )[0];
-
-        $blacklist = new BlacklistFromZip( $job->getProject()->getFirstOriginalZipPath(),  $job->id ) ;
+        $blacklist = $this->getAbstractBlacklist($params);
 
         $this->matches = $blacklist->getMatches( $params['translation'] ) ;
 
@@ -65,6 +63,20 @@ class BlacklistWorker extends AbstractWorker {
         if ( !empty( $this->queueElement->params['propagated_ids']) ) {
             $this->_propagateWarnings( ) ;
         }
+    }
+
+    /**
+     * @param $params
+     *
+     * @return AbstractBlacklist
+     * @throws \Exception
+     */
+    private function getAbstractBlacklist($params)
+    {
+        $job = (isset($params['from_upload']) and isset($params['job_password'])) ? \Jobs_JobDao::getByIdAndPassword( $params['id_job'], $params['job_password'] ) : \Jobs_JobDao::getById( $params['id_job'] )[0];
+        $blacklistUtils = new BlacklistUtils( ( new RedisHandler() )->getConnection() );
+
+        return $blacklistUtils->getAbstractBlacklist($job) ;
     }
 
     protected function _propagateWarnings()  {
