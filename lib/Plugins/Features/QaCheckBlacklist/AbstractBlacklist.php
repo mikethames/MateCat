@@ -2,6 +2,7 @@
 
 namespace Features\QaCheckBlacklist;
 
+use Matecat\Finder\WholeTextFinder;
 use RedisHandler;
 
 abstract class AbstractBlacklist {
@@ -90,7 +91,6 @@ abstract class AbstractBlacklist {
         $this->ensureCached();
 
         $blacklist_rows = $this->redis->smembers( $this->getJobCacheKey() ) ;
-
         $counter = [];
 
         foreach($blacklist_rows as $blacklist_item) {
@@ -99,12 +99,24 @@ abstract class AbstractBlacklist {
             if ( strlen( $blacklist_item ) == 0 ) { 
                 continue ; 
             }
-                
-            $quoted = preg_quote( $blacklist_item );
-            $matches = preg_match_all("/\\b$quoted\\b/u", $string) ;
 
-            if ( $matches > 0 ) {
-                $counter[ $blacklist_item ]  = $matches;
+            $matches = WholeTextFinder::find($string, $blacklist_item, true, true);
+            $positions = [];
+
+            if ( ! empty($matches) ) {
+
+                foreach ($matches as $match){
+                    $positions[] = [
+                        'start' => $match[1],
+                        'end' => $match[1] + mb_strlen($match[0]),
+                    ];
+                }
+
+                $counter[] = [
+                    'match' => $blacklist_item,
+                    'count' => count($matches),
+                    'positions' => $positions,
+                ];
             }
         }
 
