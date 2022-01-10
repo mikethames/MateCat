@@ -26,6 +26,7 @@ import {approveSegments} from '../api/approveSegments'
 import {translateSegments} from '../api/translateSegments'
 import {splitSegment} from '../api/splitSegment'
 import {copyAllSourceToTarget} from '../api/copyAllSourceToTarget'
+import {ModalWindow} from '../components/modals/ModalWindow'
 
 const SegmentActions = {
   /********* SEGMENTS *********/
@@ -191,7 +192,7 @@ const SegmentActions = {
       UI.render({
         firstLoad: false,
         segmentToOpen: sid,
-      }).done(
+      }).then(
         () => callback && setTimeout(() => callback.apply(this, [sid]), 1000),
       )
     }
@@ -253,7 +254,12 @@ const SegmentActions = {
     for (var i = 0, len = propagatedSegments.length; i < len; i++) {
       const sid = propagatedSegments[i]
       const segToModify = SegmentStore.getSegmentByIdToJS(sid)
-      if (sid !== segmentId && segment && !segToModify.splitted) {
+      if (
+        segToModify &&
+        sid !== segmentId &&
+        segment &&
+        !segToModify.splitted
+      ) {
         SegmentActions.updateOriginalTranslation(sid, segment.translation)
         SegmentActions.replaceEditAreaTextContent(sid, segment.translation)
         //Tag Projection: disable it if enable
@@ -441,7 +447,7 @@ const SegmentActions = {
         abortCopyAllSources: SegmentActions.abortCopyAllSources.bind(this),
       }
 
-      APP.ModalWindow.showModalComponent(
+      ModalWindow.showModalComponent(
         CopySourceModal,
         props,
         'Copy source to ALL segments',
@@ -995,20 +1001,20 @@ const SegmentActions = {
       text: 'It was not possible to approve all segments. There are some segments that have not been translated.',
       successText: 'Ok',
       successCallback: function () {
-        APP.ModalWindow.onCloseModal()
+        ModalWindow.onCloseModal()
       },
     }
-    APP.ModalWindow.showModalComponent(ConfirmMessageModal, props, 'Warning')
+    ModalWindow.showModalComponent(ConfirmMessageModal, props, 'Warning')
   },
   showTranslateAllModalWarnirng: function () {
     var props = {
       text: 'It was not possible to translate all segments.',
       successText: 'Ok',
       successCallback: function () {
-        APP.ModalWindow.onCloseModal()
+        ModalWindow.onCloseModal()
       },
     }
-    APP.ModalWindow.showModalComponent(ConfirmMessageModal, props, 'Warning')
+    ModalWindow.showModalComponent(ConfirmMessageModal, props, 'Warning')
   },
   approveFilteredSegments: function (segmentsArray) {
     if (segmentsArray.length >= 500) {
@@ -1044,7 +1050,7 @@ const SegmentActions = {
   },
   checkUnchangebleSegments: function (response, status) {
     if (response.unchangeble_segments.length > 0) {
-      if (config.isReview === 'APPROVED') {
+      if (!config.isReview) {
         this.showTranslateAllModalWarnirng()
       } else {
         this.showApproveAllModalWarnirng()

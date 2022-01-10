@@ -46,7 +46,6 @@ window.SegmentStore = SegmentStore
 window.Header = Header
 window.JobMetadata = JobMetadata
 
-window.ModalWindow = ModalWindow
 window.ConfirmMessageModal = ConfirmMessageModal
 window.JobMetadataModal = JobMetadataModal
 
@@ -70,4 +69,6 @@ window.SegmentUtils = SegmentUtils
 
 window.SegmentFooterTabMatches = SegmentFooterTabMatches
 
-window.lexiqaTooltipWarningPluginOptions = lexiqaTooltipWarningPluginOptions
+document.addEventListener('DOMContentLoaded', function (event) {
+  window.ModalWindow = ModalWindow
+})
