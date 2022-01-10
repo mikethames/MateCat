@@ -29,7 +29,6 @@ import OfflineUtils from './utils/offlineUtils'
 import Shortcuts from './utils/shortcuts'
 import SegmentUtils from './utils/segmentUtils'
 import SegmentFooterTabMatches from './components/segments/SegmentFooterTabMatches'
-import {pluginOptions as lexiqaTooltipWarningPluginOptions} from './api/lexiqaTooltipwarnings'
 
 window.MC = {}
 
