@@ -229,9 +229,9 @@ class SegmentsContainer extends React.Component {
       currentFile: id_file,
     }
     let styleContainer = {
-      // minWidth: 600,
-      // minHeight: 400,
-      // maxWidth: 900,
+      minWidth: 600,
+      minHeight: 400,
+      maxWidth: 900,
     }
     ModalWindow.showModalComponent(
       JobMetadataModal,
