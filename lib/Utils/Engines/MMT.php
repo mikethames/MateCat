@@ -93,16 +93,6 @@ class Engines_MMT extends Engines_AbstractEngine {
         try {
             $translation = $client->translate( $_config[ 'source' ], $_config[ 'target' ], $_config[ 'segment' ], @$_config[ 'mt_context' ], $_keys, @$_config[ 'job_id' ], static::GET_REQUEST_TIMEOUT );
 
-            // ************************************
-            // NOTE 2022-01-24
-            // ************************************
-            //
-            // MMT transforms &#10; and &amp;#13; respectively into &amp;#10; and &amp;#13;
-            //
-            // So we need to undo this before publish results on SSE channel
-            //
-            $translation[ 'translation' ] = str_replace( ['&amp;#10;', '&amp;#13;'], ["&#10;", "&#13;"], $translation[ 'translation' ] );
-
             return ( new Engines_Results_MyMemory_Matches(
                     $_config[ 'segment' ],
                     $translation[ 'translation' ],
