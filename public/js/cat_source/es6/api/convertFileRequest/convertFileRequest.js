@@ -1,37 +1,39 @@
-import {getMatecatApiDomain} from '../../utils/getMatecatApiDomain'
-import {flattenObject} from '../../utils/queryString'
-
 /**
- * PEE get data graph
+ * Convert file before analysis
  *
- * @param {Object} options
- * @param {string} options.sources
- * @param {string} options.targets
- * @param {Array} options.monthInterval
- * @param {string} options.fuzzyBand
+ * @param {string} action
+ * @param {string} file_name
+ * @param {string} source_lang
+ * @param {string} target_lang
+ * @param {string} segmentation_rule
+ * @param {AbortController} signal
  * @returns {Promise<object>}
  */
-export const peeDataGraph = async ({
-  sources,
-  targets,
-  monthInterval,
-  fuzzyBand,
+export const convertFileRequest = async ({
+  action,
+  file_name,
+  source_lang,
+  target_lang,
+  segmentation_rule,
+  signal,
 }) => {
-  const dataParams = flattenObject({
-    sources,
-    targets,
-    month_interval: monthInterval,
-    fuzzy_band: fuzzyBand,
-  })
+  const dataParams = {
+    action,
+    file_name,
+    source_lang,
+    target_lang,
+    segmentation_rule,
+  }
   const formData = new FormData()
 
   Object.keys(dataParams).forEach((key) => {
     if (dataParams[key] !== undefined) formData.append(key, dataParams[key])
   })
 
-  const response = await fetch(`/api/app/utils/pee/graph`, {
+  const response = await fetch(`action/convertFile/`, {
     method: 'POST',
     credentials: 'include',
+    signal: signal,
     body: formData,
   })
 

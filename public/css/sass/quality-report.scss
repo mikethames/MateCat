@@ -284,7 +284,6 @@ header {
                   border-left: 1px solid $grey4;
                   background: white;
                   position: relative;
-                  z-index: -1;
                   &.empty {
                     background: $grey4;
                   }
@@ -328,6 +327,9 @@ header {
                 &.qr-old {
                   background: inherit;
                   display: unset;
+                }
+                .qr-info.qr-info-total {
+                  font-size: 20px;
                 }
               }
               .qr-element.total-severity {
