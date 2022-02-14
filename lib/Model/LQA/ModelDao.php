@@ -42,14 +42,15 @@ class ModelDao extends DataAccess_AbstractDao {
 
         $model_hash = static::_getModelHash( $data );
 
-        $sql = "INSERT INTO qa_models ( label, pass_type, pass_options, `hash` ) " .
-            " VALUES ( :label, :pass_type, :pass_options, :hash ) ";
+        $sql = "INSERT INTO qa_models ( label, pass_type, pass_options, `hash`, `qa_model_template_id` ) " .
+            " VALUES ( :label, :pass_type, :pass_options, :hash, :qa_model_template_id ) ";
 
         $struct = new ModelStruct( [
-                'label'        => @$data[ 'label' ],
-                'pass_type'    => $data[ 'passfail' ][ 'type' ],
-                'pass_options' => json_encode( $data[ 'passfail' ][ 'options' ] ),
-                'hash'         => $model_hash
+            'label'                => @$data[ 'label' ],
+            'pass_type'            => $data[ 'passfail' ][ 'type' ],
+            'pass_options'         => json_encode( $data[ 'passfail' ][ 'options' ] ),
+            'hash'                 => $model_hash,
+            'qa_model_template_id' => (isset($data[ 'id_template' ])) ? $data[ 'id_template' ] : null,
         ] );
         $struct->ensureValid();
 
@@ -57,7 +58,7 @@ class ModelDao extends DataAccess_AbstractDao {
 
         $stmt = $conn->prepare( $sql );
         $stmt->execute( $struct->toArray(
-                [ 'label', 'pass_type', 'pass_options', 'hash' ]
+                [ 'label', 'pass_type', 'pass_options', 'hash', 'qa_model_template_id' ]
         ) );
 
         $struct->id = $conn->lastInsertId();

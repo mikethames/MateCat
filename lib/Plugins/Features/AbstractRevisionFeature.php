@@ -475,10 +475,16 @@ abstract class AbstractRevisionFeature extends BaseFeature {
 
     public static function loadAndValidateModelFromJsonFile( &$projectStructure, $jsonPath = null ) {
 
-        // if there a is an injected qa_model use it
-        if(isset($projectStructure['qa_model']) and null !== $projectStructure['qa_model'] ){
+        // CASE 1 there is an injected QA template id
+        if(isset($projectStructure['qa_model_template']) and null !== $projectStructure['qa_model_template']){
+            $decoded_model = $projectStructure['qa_model_template'];
+        }
+        // CASE 2 there a is an injected qa_model
+        elseif(isset($projectStructure['qa_model']) and null !== $projectStructure['qa_model'] ){
             $decoded_model = $projectStructure['qa_model'];
-        } else {
+        }
+        // CASE3 otherwise
+        else {
             // detect if the project created was a zip file, in which case try to detect
             // id_qa_model from json file.
             // otherwise assign the default model

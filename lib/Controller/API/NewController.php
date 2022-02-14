@@ -6,6 +6,7 @@ use LQA\ModelDao;
 use LQA\ModelStruct;
 use Matecat\XliffParser\XliffUtils\XliffProprietaryDetect;
 use ProjectQueue\Queue;
+use QAModelTemplate\QAModelTemplateStruct;
 use Teams\MembershipDao;
 use Matecat\XliffParser\Utils\Files as XliffFiles;
 
@@ -67,6 +68,11 @@ class NewController extends ajaxController {
     protected $qaModel;
 
     protected $projectStructure;
+
+    /**
+     * @var QAModelTemplateStruct
+     */
+    protected $qaModelTemplate;
 
     /**
      * @var ProjectManager
@@ -146,14 +152,15 @@ class NewController extends ajaxController {
                 'pretranslate_100'   => [
                         'filter' => [ 'filter' => FILTER_VALIDATE_INT ]
                 ],
-                'id_team'            => [ 'filter' => FILTER_VALIDATE_INT ],
-                'id_qa_model'        => [ 'filter' => FILTER_VALIDATE_INT ],
-                'lexiqa'             => [ 'filter' => FILTER_VALIDATE_BOOLEAN ],
-                'speech2text'        => [ 'filter' => FILTER_VALIDATE_BOOLEAN ],
-                'tag_projection'     => [ 'filter' => FILTER_VALIDATE_BOOLEAN ],
-                'project_completion' => [ 'filter' => FILTER_VALIDATE_BOOLEAN ],
-                'get_public_matches' => [ 'filter' => FILTER_VALIDATE_BOOLEAN ], // disable public TM matches
-                'instructions'       => [
+                'id_team'              => [ 'filter' => FILTER_VALIDATE_INT ],
+                'id_qa_model'          => [ 'filter' => FILTER_VALIDATE_INT ],
+                'id_qa_model_template' => [ 'filter' => FILTER_VALIDATE_INT ],
+                'lexiqa'               => [ 'filter' => FILTER_VALIDATE_BOOLEAN ],
+                'speech2text'          => [ 'filter' => FILTER_VALIDATE_BOOLEAN ],
+                'tag_projection'       => [ 'filter' => FILTER_VALIDATE_BOOLEAN ],
+                'project_completion'   => [ 'filter' => FILTER_VALIDATE_BOOLEAN ],
+                'get_public_matches'   => [ 'filter' => FILTER_VALIDATE_BOOLEAN ], // disable public TM matches
+                'instructions'         => [
                         'filter' => FILTER_SANITIZE_STRING,
                         'flags'  => FILTER_REQUIRE_ARRAY,
                 ],
@@ -193,6 +200,7 @@ class NewController extends ajaxController {
             $this->__validateSegmentationRules();
             $this->__validateTmAndKeys();
             $this->__validateTeam();
+            $this->__validateQaModelTemplate();
             $this->__validateQaModel();
             $this->__appendFeaturesToProject();
             $this->__generateTargetEngineAssociation();
@@ -636,6 +644,11 @@ class NewController extends ajaxController {
             $this->projectManager->setTeam( $this->team );
         }
 
+        // with the qa template id
+        if( $this->qaModelTemplate ) {
+            $projectStructure[ 'qa_model_template' ] = $this->qaModelTemplate->getDecodedModel();
+        }
+
         if( $this->qaModel ) {
             $projectStructure[ 'qa_model' ] = $this->qaModel->getDecodedModel();
         }
@@ -1041,6 +1054,23 @@ class NewController extends ajaxController {
             if ( $this->user ) {
                 $this->team = $this->user->getPersonalTeam();
             }
+        }
+    }
+
+    private function __validateQaModelTemplate()
+    {
+        if ( !empty( $this->postInput[ 'id_qa_model_template' ] ) ) {
+            $qaModelTemplate = \QAModelTemplate\QAModelTemplateDao::get([
+                'id' => $this->postInput[ 'id_qa_model_template' ],
+                'uid' => $this->getUser()->uid
+            ]);
+
+            // check if qa_model template exists
+            if(null === $qaModelTemplate){
+                throw new \Exception('This QA Model template does not exists or does not belongs to the logged in user');
+            }
+
+            $this->qaModelTemplate = $qaModelTemplate;
         }
     }
 
