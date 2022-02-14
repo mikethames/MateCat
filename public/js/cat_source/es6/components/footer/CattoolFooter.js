@@ -243,7 +243,7 @@ export const CattolFooter = ({
         {getTooltip('todo')}
       </div>
 
-      {!!stats && (
+      {!!stats && stats?.ANALYSIS_COMPLETE && (
         <div className="statistics-details">
           {!!stats?.WORDS_PER_HOUR && (
             <div id="stat-wph" title="Based on last 10 segments performance">
