@@ -593,6 +593,13 @@ const SegmentActions = {
       SegmentActions.replaceEditAreaTextContent(sid, translation)
     }
   },
+  setSegmentSaving(sid, saving) {
+    AppDispatcher.dispatch({
+      actionType: SegmentConstants.SET_SEGMENT_SAVING,
+      sid,
+      saving,
+    })
+  },
   /************ SPLIT ****************/
   openSplitSegment: function (sid) {
     if (OfflineUtils.offline) {
