@@ -61,7 +61,7 @@ const SegmentActions = {
           text: errors[0].message,
           type: 'error',
         }
-        APP.addNotification(notification)
+        CatToolActions.addNotification(notification)
       })
   },
   addSegments: function (segments, where) {
@@ -484,7 +484,7 @@ const SegmentActions = {
             position: 'bl',
           }),
         }
-        APP.addNotification(notification)
+        CatToolActions.addNotification(notification)
       })
   },
   abortCopyAllSources: function () {
